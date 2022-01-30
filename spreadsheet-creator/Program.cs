@@ -6,7 +6,10 @@ namespace spreadsheet_creator
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            string tmpPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            Console.WriteLine(tmpPath);
+            Console.WriteLine("Press any key to finish");
+            Console.ReadLine();
         }
     }
 }
