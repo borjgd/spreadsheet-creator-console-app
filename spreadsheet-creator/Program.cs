@@ -8,8 +8,14 @@ namespace spreadsheet_creator
     {
         static void Main(string[] args)
         {
-            string tmpPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            GetAllFiles(tmpPath);
+            if (args.Length > 0)
+            {
+                GetAllFiles(args[0]);
+            }
+            else
+            {
+                Console.WriteLine("No path passed as argument to the application");
+            }
             Console.WriteLine();
             Console.WriteLine("Press any key to finish");
             Console.ReadLine();
