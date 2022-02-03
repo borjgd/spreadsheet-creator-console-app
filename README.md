@@ -25,6 +25,6 @@ In the registration editor (regedit.exe):
 
 - Edit the default property in command to "myprogrampath\executable.exe" "%V" to pass the background folder path to Spreadsheet Creator as a parameter
 
-- Done. Now you should be able to see the option in the windows context menu when clicking on any empty space in a folder and now you can use the application as intended.
+- Done. Now you should be able to see the option in the windows context menu when clicking on any empty space in a folder of your choice and now you can use the application as intended.
 
 #### *PS: This README.md is still not finished. It will be completed very soon adding images for an easier understanding of what to do to set the register key properly*
