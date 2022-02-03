@@ -19,12 +19,30 @@ In the registration editor (regedit.exe):
   1. HKEY_CLASSES_ROOT\Directory\Background\shell -> if you are administrator
   2. HKEY_CURRENT_USER\Software\Classes\directory\shell -> if you are a normal windows user
 
+<img src="images/sc_1.JPG">
+
 - Add a new key under shell and name it Spreadsheet Creator or any other name you want for the context menu item
+
+<img src="images/sc_2.JPG">
 
 - Add a new key inside this key you've just created inside shell and name it command (mandatory name)
 
+<img src="images/sc_3.JPG">
+
 - Edit the default property in command to "myprogrampath\executable.exe" "%V" to pass the background folder path to Spreadsheet Creator as a parameter
+
+<img src="images/sc_5.JPG">
 
 - Done. Now you should be able to see the option in the windows context menu when clicking on any empty space in a folder of your choice and now you can use the application as intended.
 
-#### *PS: This README.md is still not finished. It will be completed very soon adding images for an easier understanding of what to do to set the register key properly*
+<img src="images/sc_demo.gif">
+
+Once you run the application you will need to type a name for the spreadsheet file.
+
+<img src="images/sc_6.JPG">
+
+And the spreadsheet file will be created
+
+<img src="images/sc_7.JPG">
+
+<img src="images/sc_8.JPG">
