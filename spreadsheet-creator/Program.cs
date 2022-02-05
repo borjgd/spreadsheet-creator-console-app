@@ -40,7 +40,7 @@ namespace spreadsheet_creator
         public static void CreateXLSXFile(string path, string[] filesArray)
         {
             int filesArrayLength = filesArray.Length;
-            int count = 0;
+            int count = 1;
             SLDocument oSLDocument = new SLDocument();
             System.Data.DataTable dt = new System.Data.DataTable();
             Console.WriteLine("Creating data table...");
@@ -49,17 +49,20 @@ namespace spreadsheet_creator
             // Hide cursor
             Console.CursorVisible = false;
             // Rows - Data
+            // Loading message
+            string loadingText = "Loading ";
+            Console.Write(loadingText);
+            Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
+            Console.Write(string.Format("/{0}", filesArrayLength));
             foreach (string test in filesArray)
             {
-                if (count > 0)
+                if (count > 1)
                 {
                     int currentLineCursor = Console.CursorTop;
-                    Console.SetCursorPosition(0, currentLineCursor);
-                    Console.Write(new string(' ', Console.WindowWidth));
-                    Console.SetCursorPosition(0, currentLineCursor);
+                    Console.SetCursorPosition(loadingText.Length, currentLineCursor);
+                    Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
                 }
                 count++;
-                Console.Write(string.Format("{0}/{1}", count, filesArrayLength));
                 // Add file to rows
                 dt.Rows.Add(Path.GetFileName(test));
             }
