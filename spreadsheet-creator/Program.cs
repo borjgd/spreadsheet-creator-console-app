@@ -41,11 +41,32 @@ namespace spreadsheet_creator
         {
             int filesArrayLength = filesArray.Length;
             int count = 1;
+            int currentLineCursor = 0;
             SLDocument oSLDocument = new SLDocument();
             System.Data.DataTable dt = new System.Data.DataTable();
             Console.WriteLine("Creating data table...");
             // Columns - Headers
             dt.Columns.Add("File Name", typeof(string));
+            
+            bool addNewCol = true;
+            while(addNewCol)
+            {
+                Console.Write("Do you want to add another column? (Y/N): ");
+                string moreColumns = Convert.ToString(Console.ReadLine());
+                if (moreColumns.ToUpper() == "Y")
+                {
+                    Console.Write("Type the name of the column: ");
+                    string newCol = Console.ReadLine();
+                    dt.Columns.Add(newCol, typeof(string));
+                    Console.SetCursorPosition(0, Console.CursorTop -1);
+                    Console.Write(new string(' ', Console.WindowWidth));
+                }
+                else
+                    addNewCol = false;
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, Console.CursorTop);
+            };
             // Hide cursor
             Console.CursorVisible = false;
             // Rows - Data
@@ -58,7 +79,7 @@ namespace spreadsheet_creator
             {
                 if (count > 1)
                 {
-                    int currentLineCursor = Console.CursorTop;
+                    currentLineCursor = Console.CursorTop;
                     Console.SetCursorPosition(loadingText.Length, currentLineCursor);
                     Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
                 }
