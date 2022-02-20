@@ -39,6 +39,7 @@ namespace spreadsheet_creator
 
         public static void CreateXLSXFile(string path, string[] filesArray)
         {
+            const string FILE_EXTENSION = ".xlsx";
             int filesArrayLength = filesArray.Length;
             int count = 1;
             int currentLineCursor = 0;
@@ -70,12 +71,12 @@ namespace spreadsheet_creator
             // Hide cursor
             Console.CursorVisible = false;
             // Rows - Data
-            // Loading message
+            // Loading files
             string loadingText = "Loading ";
             Console.Write(loadingText);
             Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
             Console.Write(string.Format("/{0}", filesArrayLength));
-            foreach (string test in filesArray)
+            foreach (string file in filesArray)
             {
                 if (count > 1)
                 {
@@ -85,7 +86,7 @@ namespace spreadsheet_creator
                 }
                 count++;
                 // Add file to rows
-                dt.Rows.Add(Path.GetFileName(test));
+                dt.Rows.Add(Path.GetFileName(file));
             }
             // Show Cursor
             Console.CursorVisible = true;
@@ -93,11 +94,46 @@ namespace spreadsheet_creator
             // Import datatable to spreadsheet
             Console.WriteLine("Importing data table to spreadsheet...");
             oSLDocument.ImportDataTable(1, 1, dt, true);
-            Console.WriteLine("Insert the name of the spreadsheet file: ");
-            string userInput_fileName = Console.ReadLine();
-            Console.WriteLine("Saving file...");
-            oSLDocument.SaveAs(path + "\\" + userInput_fileName + ".xlsx");
+            Console.Write("Insert the name of the spreadsheet file: ");
+            string userInputFileName = Console.ReadLine();
+            string newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
+            // Checking If file exists
+            bool test = CheckIfFileExists(newFilePath);
+            if (CheckIfFileExists(newFilePath))
+            {
+                // Overwrite the file
+                Console.WriteLine("There's already a spreadsheet file with the given name and the extension " + FILE_EXTENSION);
+                Console.Write("Do you want to overwrite the file? (Y/N): ");
+                string overwriteFileName = Convert.ToString(Console.ReadLine());
+                if (overwriteFileName.ToUpper() == "N" || overwriteFileName.ToUpper() == "NO")
+                {
+                    newFilePath = CreateNameCopy(path, userInputFileName, FILE_EXTENSION);
+                }
+            }
+            Console.Write("Saving file...");
+            oSLDocument.SaveAs(newFilePath);
             Console.WriteLine("Done");
+        }
+
+        public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
+        {
+            string copyWatermark = "_copy_";
+            int copyNumber = 0;
+            string newFileName, newPath;
+            bool copyExists;
+            do
+            {
+                copyNumber++;
+                newFileName = pFileName + copyWatermark + copyNumber;
+                newPath = pDirectoryPath + "\\" + newFileName + pFILE_EXTENSION;
+                copyExists = CheckIfFileExists(newPath);
+            } while (copyExists);
+            return newPath;
+        }
+
+        public static bool CheckIfFileExists(string filePath)
+        {
+            return File.Exists(filePath);
         }
     }
 }
