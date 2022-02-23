@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using SpreadsheetLight;
 
 namespace spreadsheet_creator
@@ -91,14 +92,24 @@ namespace spreadsheet_creator
             // Show Cursor
             Console.CursorVisible = true;
             Console.WriteLine();
+            
             // Import datatable to spreadsheet
             Console.WriteLine("Importing data table to spreadsheet...");
             oSLDocument.ImportDataTable(1, 1, dt, true);
             Console.Write("Insert the name of the spreadsheet file: ");
             string userInputFileName = Console.ReadLine();
             string newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
+
+            // Checking If the name introduced by the user contains invalid characters
+            while(CheckFileNameInvalidChars(userInputFileName))
+            {
+                Console.WriteLine("Please, do not select a name with invalid characters for the spreadsheet file");
+                Console.Write("Insert a new name for the spreadsheet file: ");
+                userInputFileName = Console.ReadLine();
+                newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
+            }
+
             // Checking If file exists
-            bool test = CheckIfFileExists(newFilePath);
             if (CheckIfFileExists(newFilePath))
             {
                 // Overwrite the file
@@ -129,6 +140,11 @@ namespace spreadsheet_creator
                 copyExists = CheckIfFileExists(newPath);
             } while (copyExists);
             return newPath;
+        }
+        
+        public static bool CheckFileNameInvalidChars(string pFileName)
+        {
+            return pFileName.Any(Path.GetInvalidFileNameChars().Contains);
         }
 
         public static bool CheckIfFileExists(string filePath)
