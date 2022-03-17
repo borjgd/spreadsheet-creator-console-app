@@ -41,39 +41,15 @@ namespace spreadsheet_creator
         public static void CreateXLSXFile(string path, string[] filesArray)
         {
             const string FILE_EXTENSION = ".xlsx";
-            int filesArrayLength = filesArray.Length;
-            int count = 1;
-            int currentLineCursor = 0;
+            // Create Spreadsheet encapsulation
             SLDocument oSLDocument = new SLDocument();
             System.Data.DataTable dt = new System.Data.DataTable();
             Console.WriteLine("Creating data table...");
             // Add columns to DataTable
             dt = AddDataTableCols(dt);
-            // Hide cursor
-            Console.CursorVisible = false;
-            // Rows - Data
-            // Loading files
-            string loadingText = "Loading ";
-            Console.Write(loadingText);
-            Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
-            Console.Write(string.Format("/{0}", filesArrayLength));
-            foreach (string file in filesArray)
-            {
-                if (count > 1)
-                {
-                    currentLineCursor = Console.CursorTop;
-                    Console.SetCursorPosition(loadingText.Length, currentLineCursor);
-                    Console.Write("{0}", count.ToString("D" + filesArrayLength.ToString().Length));
-                }
-                count++;
-                // Add file to rows
-                dt.Rows.Add(Path.GetFileName(file));
-            }
-            // Show Cursor
-            Console.CursorVisible = true;
-            Console.WriteLine();
-            
-            // Import datatable to spreadsheet
+            // Add rows to DataTable
+            dt = AddDataTableRows(filesArray, dt);
+            // Import DataTable to spreadsheet
             Console.WriteLine("Importing data table to spreadsheet...");
             oSLDocument.ImportDataTable(1, 1, dt, true);
             Console.Write("Insert the name of the spreadsheet file: ");
@@ -130,6 +106,39 @@ namespace spreadsheet_creator
                 Console.SetCursorPosition(0, Console.CursorTop);
             };
             return returnDataTable;
+        }
+
+        public static System.Data.DataTable AddDataTableRows(string[] pFilesArray, System.Data.DataTable pDataTable)
+        {
+            System.Data.DataTable returnDataTable = pDataTable;
+            int filesArrayLength = pFilesArray.Length;
+            int filesCount = 1;
+            int currentLineCursor = 0;
+
+            // Hide cursor
+            Console.CursorVisible = false;
+            // Loading files
+            string loadingText = "Loading ";
+            Console.Write(loadingText);
+            // Writting the loading message
+            Console.Write("{0}", filesCount.ToString("D" + filesArrayLength.ToString().Length));
+            Console.Write(string.Format("/{0}", filesArrayLength));
+            foreach (string file in pFilesArray)
+            {
+                if (filesCount > 1)
+                {
+                    currentLineCursor = Console.CursorTop;
+                    Console.SetCursorPosition(loadingText.Length, currentLineCursor);
+                    Console.Write("{0}", filesCount.ToString("D" + filesArrayLength.ToString().Length));
+                }
+                filesCount++;
+                // Add file to rows
+                pDataTable.Rows.Add(Path.GetFileName(file));
+            }
+            // Show Cursor
+            Console.CursorVisible = true;
+            Console.WriteLine();
+            return pDataTable;
         }
 
         public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
