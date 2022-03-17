@@ -52,19 +52,9 @@ namespace spreadsheet_creator
             // Import DataTable to spreadsheet
             Console.WriteLine("Importing data table to spreadsheet...");
             oSLDocument.ImportDataTable(1, 1, dt, true);
-            Console.Write("Insert the name of the spreadsheet file: ");
-            string userInputFileName = Console.ReadLine();
+            // Naming the output file
+            string userInputFileName = SpreadsheetNameInput();
             string newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
-
-            // Checking If the name introduced by the user contains invalid characters
-            while(CheckFileNameInvalidChars(userInputFileName))
-            {
-                Console.WriteLine("Please, do not select a name with invalid characters for the spreadsheet file");
-                Console.Write("Insert a new name for the spreadsheet file: ");
-                userInputFileName = Console.ReadLine();
-                newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
-            }
-
             // Checking If file exists
             if (CheckIfFileExists(newFilePath))
             {
@@ -139,6 +129,20 @@ namespace spreadsheet_creator
             Console.CursorVisible = true;
             Console.WriteLine();
             return pDataTable;
+        }
+
+        public static string SpreadsheetNameInput()
+        {
+            Console.Write("Insert the name of the spreadsheet file: ");
+            string fileName = Console.ReadLine();
+            // Checking If the name introduced by the user contains invalid characters
+            while (CheckFileNameInvalidChars(fileName))
+            {
+                Console.WriteLine("Please, do not select a name with invalid characters for the spreadsheet file");
+                Console.Write("Insert a new name for the spreadsheet file: ");
+                fileName = Console.ReadLine();
+            }
+            return fileName;
         }
 
         public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
