@@ -59,13 +59,8 @@ namespace spreadsheet_creator
             if (CheckIfFileExists(newFilePath))
             {
                 // Overwrite the file
-                Console.WriteLine("There's already a spreadsheet file with the given name and the extension " + FILE_EXTENSION);
-                Console.Write("Do you want to overwrite the file? (Y/N): ");
-                string overwriteFileName = Convert.ToString(Console.ReadLine());
-                if (overwriteFileName.ToUpper() == "N" || overwriteFileName.ToUpper() == "NO")
-                {
+                if (!OverwriteFileName(FILE_EXTENSION))
                     newFilePath = CreateNameCopy(path, userInputFileName, FILE_EXTENSION);
-                }
             }
             Console.Write("Saving file...");
             oSLDocument.SaveAs(newFilePath);
@@ -131,7 +126,7 @@ namespace spreadsheet_creator
             return pDataTable;
         }
 
-        public static string SpreadsheetNameInput()
+        public static string SpreadsheetNameInput ()
         {
             Console.Write("Insert the name of the spreadsheet file: ");
             string fileName = Console.ReadLine();
@@ -143,6 +138,19 @@ namespace spreadsheet_creator
                 fileName = Console.ReadLine();
             }
             return fileName;
+        }
+
+        public static bool OverwriteFileName (string pFILE_EXTENSION)
+        {
+            bool overwriteFile = true;
+            Console.WriteLine("There's already a spreadsheet file with the given name and the extension " + pFILE_EXTENSION);
+            Console.Write("Do you want to overwrite the file? (Y/N): ");
+            string overwriteFileName = Convert.ToString(Console.ReadLine());
+            if (overwriteFileName.ToUpper() == "N" || overwriteFileName.ToUpper() == "NO")
+            {
+                overwriteFile = false;
+            }
+            return overwriteFile;
         }
 
         public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
