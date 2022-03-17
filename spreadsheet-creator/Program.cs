@@ -47,28 +47,8 @@ namespace spreadsheet_creator
             SLDocument oSLDocument = new SLDocument();
             System.Data.DataTable dt = new System.Data.DataTable();
             Console.WriteLine("Creating data table...");
-            // Columns - Headers
-            dt.Columns.Add("File Name", typeof(string));
-            
-            bool addNewCol = true;
-            while(addNewCol)
-            {
-                Console.Write("Do you want to add another column? (Y/N): ");
-                string moreColumns = Convert.ToString(Console.ReadLine());
-                if (moreColumns.ToUpper() == "Y")
-                {
-                    Console.Write("Type the name of the column: ");
-                    string newCol = Console.ReadLine();
-                    dt.Columns.Add(newCol, typeof(string));
-                    Console.SetCursorPosition(0, Console.CursorTop -1);
-                    Console.Write(new string(' ', Console.WindowWidth));
-                }
-                else
-                    addNewCol = false;
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
-                Console.Write(new string(' ', Console.WindowWidth));
-                Console.SetCursorPosition(0, Console.CursorTop);
-            };
+            // Add columns to DataTable
+            dt = AddDataTableCols(dt);
             // Hide cursor
             Console.CursorVisible = false;
             // Rows - Data
@@ -124,6 +104,32 @@ namespace spreadsheet_creator
             Console.Write("Saving file...");
             oSLDocument.SaveAs(newFilePath);
             Console.WriteLine("Done");
+        }
+
+        public static System.Data.DataTable AddDataTableCols(System.Data.DataTable pDataTable)
+        {
+            System.Data.DataTable returnDataTable = pDataTable;
+            returnDataTable.Columns.Add("File Name", typeof(string));
+            bool addNewCol = true;
+            while (addNewCol)
+            {
+                Console.Write("Do you want to add another column? (Y/N): ");
+                string moreColumns = Convert.ToString(Console.ReadLine());
+                if (moreColumns.ToUpper() == "Y")
+                {
+                    Console.Write("Type the name of the column: ");
+                    string newCol = Console.ReadLine();
+                    returnDataTable.Columns.Add(newCol, typeof(string));
+                    Console.SetCursorPosition(0, Console.CursorTop - 1);
+                    Console.Write(new string(' ', Console.WindowWidth));
+                }
+                else
+                    addNewCol = false;
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, Console.CursorTop);
+            };
+            return returnDataTable;
         }
 
         public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
