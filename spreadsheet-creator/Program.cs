@@ -11,7 +11,12 @@ namespace spreadsheet_creator
         {
             if (args.Length > 0)
             {
-                GetAllFiles(args[0]);
+                var folderPath = args[0];
+                var folderFiles = GetAllFiles(folderPath);
+                if (folderFiles.Length > 0)
+                    CreateSpreadsheet(folderPath, folderFiles);
+                else
+                    Console.WriteLine("No files found in this directory");
             }
             else
             {
@@ -22,65 +27,54 @@ namespace spreadsheet_creator
             Console.ReadLine();
         }
 
-        public static void GetAllFiles(string path)
+        /// <summary>
+        /// Gets all files from the given folder path
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        public static string[] GetAllFiles(string folderPath)
         {
-            if (Directory.Exists(path))
-            {
-                string[] pathExistingFiles = Directory.GetFiles(path);
-                if (pathExistingFiles.Length > 0)
-                {
-                    CreateXLSXFile(path, pathExistingFiles);
-                }
-                else
-                {
-                    Console.WriteLine("No files found in this directory");
-                }
-            }
+            return Directory.GetFiles(folderPath);
         }
 
-        public static void CreateXLSXFile(string path, string[] filesArray)
+        /// <summary>
+        /// Creates spreadsheet adding columns and rows
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="filesArray"></param>
+        public static void CreateSpreadsheet(string folderPath, string[] filesArray)
         {
-            const string FILE_EXTENSION = ".xlsx";
-            // Create Spreadsheet encapsulation
-            SLDocument oSLDocument = new SLDocument();
-            System.Data.DataTable dt = new System.Data.DataTable();
-            Console.WriteLine("Creating data table...");
-            // Add columns to DataTable
+            Console.WriteLine("Creating spreadsheet...");
+            Spreadsheet spreadsheet = new();
+            System.Data.DataTable dt = new();
             dt = AddDataTableCols(dt);
-            // Add rows to DataTable
             dt = AddDataTableRows(filesArray, dt);
-            // Import DataTable to spreadsheet
-            Console.WriteLine("Importing data table to spreadsheet...");
-            oSLDocument.ImportDataTable(1, 1, dt, true);
-            // Naming the output file
-            string userInputFileName = SpreadsheetNameInput();
-            string newFilePath = path + "\\" + userInputFileName + FILE_EXTENSION;
-            // Checking If file exists
-            if (CheckIfFileExists(newFilePath))
-            {
-                // Overwrite the file
-                if (!OverwriteFileName(FILE_EXTENSION))
-                    newFilePath = CreateNameCopy(path, userInputFileName, FILE_EXTENSION);
-            }
-            Console.Write("Saving file...");
-            oSLDocument.SaveAs(newFilePath);
-            Console.WriteLine("Done");
+            var userInputFileName = SpreadsheetNameInput();
+            var fileExtension = spreadsheet.GetFileExtension();
+            var newFilePath = Path.Combine(folderPath, userInputFileName + fileExtension);
+            if (CheckIfFileExists(newFilePath) && !ShouldOverwriteFileName())
+                _ = CreatFileNameCopy(folderPath, userInputFileName, fileExtension);
+            spreadsheet.Create(dt, folderPath, userInputFileName);
         }
 
-        public static System.Data.DataTable AddDataTableCols(System.Data.DataTable pDataTable)
+        /// <summary>
+        /// Add columns to the DataTable object
+        /// </summary>
+        /// <param name="dataTable"></param>
+        /// <returns></returns>
+        public static System.Data.DataTable AddDataTableCols(System.Data.DataTable dataTable)
         {
-            System.Data.DataTable returnDataTable = pDataTable;
-            returnDataTable.Columns.Add("File Name", typeof(string));
+            dataTable.Columns.Add("File Name", typeof(string));
             bool addNewCol = true;
             while (addNewCol)
             {
                 Console.Write("Do you want to add another column? (Y/N): ");
                 string moreColumns = Convert.ToString(Console.ReadLine());
-                if (moreColumns.ToUpper() == "Y")
+                if (moreColumns.ToUpper().Equals("Y"))
                 {
                     Console.Write("Type the name of the column: ");
                     string newCol = Console.ReadLine();
-                    returnDataTable.Columns.Add(newCol, typeof(string));
+                    dataTable.Columns.Add(newCol, typeof(string));
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
                     Console.Write(new string(' ', Console.WindowWidth));
                 }
@@ -89,48 +83,53 @@ namespace spreadsheet_creator
                 Console.SetCursorPosition(0, Console.CursorTop - 1);
                 Console.Write(new string(' ', Console.WindowWidth));
                 Console.SetCursorPosition(0, Console.CursorTop);
-            };
-            return returnDataTable;
+            }
+            return dataTable;
         }
 
-        public static System.Data.DataTable AddDataTableRows(string[] pFilesArray, System.Data.DataTable pDataTable)
+        /// <summary>
+        /// Add rows with the files array data to the DataTable object
+        /// </summary>
+        /// <param name="filesArray"></param>
+        /// <param name="dataTable"></param>
+        /// <returns></returns>
+        public static System.Data.DataTable AddDataTableRows(string[] filesArray, System.Data.DataTable dataTable)
         {
-            System.Data.DataTable returnDataTable = pDataTable;
-            int filesArrayLength = pFilesArray.Length;
+            int filesArrayLength = filesArray.Length;
             int filesCount = 1;
-            int currentLineCursor = 0;
-
+            
             // Hide cursor
             Console.CursorVisible = false;
-            // Loading files
-            string loadingText = "Loading ";
+            // Loading message
+            string loadingText = "Loading...";
             Console.Write(loadingText);
-            // Writting the loading message
             Console.Write("{0}", filesCount.ToString("D" + filesArrayLength.ToString().Length));
             Console.Write(string.Format("/{0}", filesArrayLength));
-            foreach (string file in pFilesArray)
+            foreach (string file in filesArray)
             {
                 if (filesCount > 1)
                 {
-                    currentLineCursor = Console.CursorTop;
+                    var currentLineCursor = Console.CursorTop;
                     Console.SetCursorPosition(loadingText.Length, currentLineCursor);
                     Console.Write("{0}", filesCount.ToString("D" + filesArrayLength.ToString().Length));
                 }
                 filesCount++;
-                // Add file to rows
-                pDataTable.Rows.Add(Path.GetFileName(file));
+                dataTable.Rows.Add(Path.GetFileName(file));
             }
             // Show Cursor
             Console.CursorVisible = true;
             Console.WriteLine();
-            return pDataTable;
+            return dataTable;
         }
 
+        /// <summary>
+        /// Asks user to insert a name for the spreadsheet file
+        /// </summary>
+        /// <returns></returns>
         public static string SpreadsheetNameInput ()
         {
             Console.Write("Insert the name of the spreadsheet file: ");
             string fileName = Console.ReadLine();
-            // Checking If the name introduced by the user contains invalid characters
             while (CheckFileNameInvalidChars(fileName))
             {
                 Console.WriteLine("Please, do not select a name with invalid characters for the spreadsheet file");
@@ -140,40 +139,59 @@ namespace spreadsheet_creator
             return fileName;
         }
 
-        public static bool OverwriteFileName (string pFILE_EXTENSION)
+        /// <summary>
+        /// Asks user If the file name should be overwritten when the file already exists
+        /// </summary>
+        /// <returns></returns>
+        public static bool ShouldOverwriteFileName()
         {
             bool overwriteFile = true;
-            Console.WriteLine("There's already a spreadsheet file with the given name and the extension " + pFILE_EXTENSION);
+            Console.WriteLine("There's already a spreadsheet file with the given name");
             Console.Write("Do you want to overwrite the file? (Y/N): ");
             string overwriteFileName = Convert.ToString(Console.ReadLine());
-            if (overwriteFileName.ToUpper() == "N" || overwriteFileName.ToUpper() == "NO")
-            {
+            if (overwriteFileName.ToUpper().Equals("N") || overwriteFileName.ToUpper().Equals("NO"))
                 overwriteFile = false;
-            }
             return overwriteFile;
         }
 
-        public static string CreateNameCopy (string pDirectoryPath, string pFileName, string pFILE_EXTENSION)
+        /// <summary>
+        /// Creates a new name when the file already exists
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="pFileName"></param>
+        /// <param name="pFILE_EXTENSION"></param>
+        /// <returns></returns>
+        public static string CreatFileNameCopy (string folderPath, string fileName, string fileExtension)
         {
             string copyWatermark = "_copy_";
             int copyNumber = 0;
-            string newFileName, newPath;
+            string newFileName, newFilePath;
             bool copyExists;
             do
             {
                 copyNumber++;
-                newFileName = pFileName + copyWatermark + copyNumber;
-                newPath = pDirectoryPath + "\\" + newFileName + pFILE_EXTENSION;
-                copyExists = CheckIfFileExists(newPath);
+                newFileName = $"{fileName}{copyWatermark}{copyNumber}";
+                newFilePath = Path.Combine(folderPath, newFileName + fileExtension);
+                copyExists = CheckIfFileExists(newFilePath);
             } while (copyExists);
-            return newPath;
-        }
-        
-        public static bool CheckFileNameInvalidChars(string pFileName)
-        {
-            return pFileName.Any(Path.GetInvalidFileNameChars().Contains);
+            return newFilePath;
         }
 
+        /// <summary>
+        /// Checks If file name contains any invalid chars
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static bool CheckFileNameInvalidChars(string fileName)
+        {
+            return fileName.Any(Path.GetInvalidFileNameChars().Contains);
+        }
+
+        /// <summary>
+        /// Checks If a file exists
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
         public static bool CheckIfFileExists(string filePath)
         {
             return File.Exists(filePath);
